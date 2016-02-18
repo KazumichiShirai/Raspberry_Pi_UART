@@ -18,6 +18,8 @@
 #define SERIAL_PORT "/dev/ttyAMA0" 
 #define BAUDRATE B19200
 
+//Size to read UART buffer
+#define READ_MAX_SIZE (255)
 static struct termios oldtio; //save original termios setting
 
 int initializeUART(int *fd)
@@ -48,4 +50,32 @@ void closeUART(int fd)
 {
      ioctl(fd, TCSETS, &oldtio);       //Recovery serial setting
      close(fd);
+}
+
+int recvDataUART(int fd, char recv_buf[], int buf_size)
+{
+     int size;
+     char prtcl;
+     char len, remain_len;
+     char tmp_recv_buf[READ_MAX_SIZE];
+     int i, j,idx;
+     int retry = 3;
+     int check_sum = 0;
+
+     size = read(fd, tmp_recv_buf, READ_MAX_SIZE);
+     if(size < 0){
+       fprintf(stderr, "Return value from read()is error, %s, %d\n",__FILE__, __LINE__);
+       return -1;
+     }
+
+     if(size > buf_size){
+       fprintf(stderr, "Data size is larger than buf_size, %s, %d\n",__FILE__, __LINE__);
+       return -1;
+     }
+
+     for(i=0;i<size;i++){
+       recv_buf[i] = tmp_recv_buf[i];
+     }
+
+     return size;
 }
