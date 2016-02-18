@@ -55,12 +55,8 @@ void closeUART(int fd)
 int recvDataUART(int fd, char recv_buf[], int buf_size)
 {
      int size;
-     char prtcl;
-     char len, remain_len;
      char tmp_recv_buf[READ_MAX_SIZE];
-     int i, j,idx;
-     int retry = 3;
-     int check_sum = 0;
+     int i;
 
      size = read(fd, tmp_recv_buf, READ_MAX_SIZE);
      if(size < 0){
